@@ -278,80 +278,122 @@ async function setWorld(worldState) {
         enemy
       ])
       player.onCollide(enemy, (object) => {
-        footsteps.paused = true;
-        worldState.worldMusic.volume = 0
-        encounterMusic = play(Sounds.enemyEncounter, {loop: false, volume: SoundVolume})
-        encounterMusic.then(() => tween(worldState.worldMusic.volume, SoundVolume / 2, 1, (val) => worldState.worldMusic.volume = val, easings.easeInQuad))
-        worldState.playerObject.position = player.pos    
-        worldState.enemyName = enemy
-        player.isInDialogue = true
-        const dialogueBoxFixedContainer = add([fixed(), z(1000)])
-        const dialogueBox = dialogueBoxFixedContainer.add([
-          rect(1000, 200, {radius: 32}),
-          outline(5),
-          pos(150, 500),
-          fixed(),
-        ])
-        dialogueBox.add([
-          text(`[wavy]${object.name}[/wavy][normal]: ${object.openingMessages[0]}[/normal]`, {
-            size: 42,
-            width: 900,
-            lineSpacing: 15,
-            font: 'pixelFont',
-            align: 'center',
-            styles: {
-              wavy: (idx, ch) => ({
-                  color: Color.fromHex(Colors.malwareBlue),
-                  pos: vec2(0, wave(-4, 4, time() * 6 + idx * 0.5)),
-                }),
-              normal: {
-                color: Color.fromHex(Colors.worldBackground)
-              }
-            }
-          }),
-          pos(40,30),
-          fixed(),
-        ])
-        enemyStatement += 1;
-        onUpdate(() => {
-          if (isKeyPressed('space')) {
-            if (enemyStatement >= object.openingMessages.length) {
+        if (worldState.faintedMons.length < 3 && enemies[enemy].threatName === "Exploit Eagan"){
+          footsteps.paused = true;
+            player.isInDialogue = true
+            const dialogueBoxFixedContainer = add([fixed(), z(1000)])
+            const dialogueBox = dialogueBoxFixedContainer.add([
+              rect(1000, 200, {radius: 32}),
+              outline(5),
+              pos(150, 500),
+              fixed(),
+            ])
+            dialogueBox.add([
+              text(`[wavy]${object.name}[/wavy][normal]: Your protection score is not high enough to face me yet!.[/normal]`, {
+                size: 42,
+                width: 900,
+                lineSpacing: 15,
+                font: 'pixelFont',
+                align: 'center',
+                styles: {
+                  wavy: (idx, ch) => ({
+                      color: Color.fromHex(Colors.malwareBlue),
+                      pos: vec2(0, wave(-4, 4, time() * 6 + idx * 0.5)),
+                    }),
+                  normal: {
+                    color: Color.fromHex(Colors.worldBackground)
+                  }
+                }
+              }),
+              pos(40,30),
+              fixed(),
+            ])
+            onUpdate(() => {
+            if (isKeyPressed('space')) {
               dialogueBoxFixedContainer.hidden = true
               dialogueBox.remove(dialogueBox.children[0])
-              player.isInDialogue = false;
-              enemyStatement = 0;
-              worldState.worldMusic.paused = true;
-              encounterMusic.paused = true;
-              go(SceneNames.battle, worldState); 
-            } else {
-              if (enemyStatement > 0) dialogueBox.remove(dialogueBox.children[0]) 
-              player.isInDialogue = true
               play(Sounds.select, {loop: false, volume: SoundVolume})
-              dialogueBox.add([
-                text(`[wavy]${object.name}[/wavy][normal]: ${object.openingMessages[enemyStatement]}[/normal]`, {
-                  size: 42,
-                  width: 900,
-                  lineSpacing: 15,
-                  font: 'pixelFont',
-                  align: 'center',
-                  styles: {
-                    wavy: (idx, ch) => ({
-                        color: Color.fromHex(Colors.malwareBlue),
-                        pos: vec2(0, wave(-4, 4, time() * 6 + idx * 0.5)),
-                      }),
-                    normal: {
-                      color: Color.fromHex(Colors.worldBackground)
+              player.isInDialogue = false;
+              currentKeyPressed = "";
+
+            }})
+        
+        } else {
+          footsteps.paused = true;
+          worldState.worldMusic.volume = 0
+          encounterMusic = play(Sounds.enemyEncounter, {loop: false, volume: SoundVolume})
+          encounterMusic.then(() => tween(worldState.worldMusic.volume, SoundVolume / 2, 1, (val) => worldState.worldMusic.volume = val, easings.easeInQuad))
+          worldState.playerObject.position = player.pos    
+          worldState.enemyName = enemy
+          player.isInDialogue = true
+          const dialogueBoxFixedContainer = add([fixed(), z(1000)])
+          const dialogueBox = dialogueBoxFixedContainer.add([
+            rect(1000, 200, {radius: 32}),
+            outline(5),
+            pos(150, 500),
+            fixed(),
+          ])
+          dialogueBox.add([
+            text(`[wavy]${object.name}[/wavy][normal]: ${object.openingMessages[0]}[/normal]`, {
+              size: 42,
+              width: 900,
+              lineSpacing: 15,
+              font: 'pixelFont',
+              align: 'center',
+              styles: {
+                wavy: (idx, ch) => ({
+                    color: Color.fromHex(Colors.malwareBlue),
+                    pos: vec2(0, wave(-4, 4, time() * 6 + idx * 0.5)),
+                  }),
+                normal: {
+                  color: Color.fromHex(Colors.worldBackground)
+                }
+              }
+            }),
+            pos(40,30),
+            fixed(),
+          ])
+          enemyStatement += 1;
+          onUpdate(() => {
+            if (isKeyPressed('space')) {
+              if (enemyStatement >= object.openingMessages.length) {
+                dialogueBoxFixedContainer.hidden = true
+                dialogueBox.remove(dialogueBox.children[0])
+                player.isInDialogue = false;
+                enemyStatement = 0;
+                worldState.worldMusic.paused = true;
+                encounterMusic.paused = true;
+                go(SceneNames.battle, worldState); 
+              } else {
+                if (enemyStatement > 0) dialogueBox.remove(dialogueBox.children[0]) 
+                player.isInDialogue = true
+                play(Sounds.select, {loop: false, volume: SoundVolume})
+                dialogueBox.add([
+                  text(`[wavy]${object.name}[/wavy][normal]: ${object.openingMessages[enemyStatement]}[/normal]`, {
+                    size: 42,
+                    width: 900,
+                    lineSpacing: 15,
+                    font: 'pixelFont',
+                    align: 'center',
+                    styles: {
+                      wavy: (idx, ch) => ({
+                          color: Color.fromHex(Colors.malwareBlue),
+                          pos: vec2(0, wave(-4, 4, time() * 6 + idx * 0.5)),
+                        }),
+                      normal: {
+                        color: Color.fromHex(Colors.worldBackground)
+                      }
                     }
-                  }
-                }),
-                pos(40,30),
-                fixed(),
-              ])
-              dialogueBoxFixedContainer.hidden = false
-              enemyStatement += 1
+                  }),
+                  pos(40,30),
+                  fixed(),
+                ])
+                dialogueBoxFixedContainer.hidden = false
+                enemyStatement += 1
+              }
             }
-          }
-        })
+          })
+      }
       })  
     }
   }
